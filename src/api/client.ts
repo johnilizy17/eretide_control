@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // API Base URL - configure based on environment
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || 'https://full-application.vercel.app/api/v1';
+  import.meta.env.VITE_API_BASE_URL || 'https://full-application.vercel.app/api/v2';
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,

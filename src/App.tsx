@@ -11,6 +11,7 @@ import { Monitoring } from './pages/Monitoring';
 import { Reports } from './pages/Reports';
 import { ReportDetail } from './pages/ReportDetail';
 import { AuditLogs } from './pages/AuditLogs';
+import { Settings } from './pages/Settings';
 
 function App() {
   return (
@@ -42,7 +43,7 @@ function App() {
           <Route path="reports/:id" element={<ReportDetail />} />
           <Route path="freeze-restrict" element={<Accounts />} />
           <Route path="audit-logs" element={<AuditLogs />} />
-          <Route path="settings" element={<div className="p-6">Settings - Coming Soon</div>} />
+          <Route path="settings" element={<Settings/>}/>
         </Route>
 
         {/* Catch all - redirect to dashboard */}

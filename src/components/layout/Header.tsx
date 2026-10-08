@@ -1,6 +1,7 @@
-import { Bell, Menu, Search, X, LogOut } from 'lucide-react';
+import { Menu, Search, X, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
+import { NotificationsPanel } from './NotificationsPanel';
 
 interface HeaderProps {
   sidebarOpen: boolean;
@@ -17,19 +18,24 @@ export const Header = ({ sidebarOpen, toggleSidebar }: HeaderProps) => {
   };
 
   return (
-    <header className="bg-white border-b border-gray-200 h-16 fixed top-0 right-0 left-0 z-30">
-      <div className="h-full flex items-center justify-between px-6">
-        <div className="flex items-center gap-4">
+    <header
+      className={`bg-white/95 backdrop-blur border-b border-gray-200 h-16 fixed top-0 right-0 left-0 z-30 transition-all duration-300 ${
+        sidebarOpen ? 'lg:left-64' : 'lg:left-20'
+      }`}
+    >
+      <div className="h-full flex items-center justify-between px-4 sm:px-6">
+        <div className="flex items-center gap-4 min-w-0">
           <button
             onClick={toggleSidebar}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="hidden lg:flex items-center justify-center w-9 h-9 hover:bg-slate-100 rounded-lg transition-colors text-slate-600"
+            aria-label="Toggle sidebar"
           >
             {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
 
-          <div className="hidden md:block">
-            <h1 className="text-xl font-bold text-slate-900">Financial Control Center</h1>
-            <p className="text-xs text-slate-500">
+          <div className="min-w-0">
+            <h1 className="text-xl font-bold text-slate-900 truncate">Financial Control Center</h1>
+            <p className="text-xs text-slate-500 truncate">
               Monitor and control all cooperative transactions across Communities, Branches, Zones and Apex
             </p>
           </div>
@@ -46,24 +52,9 @@ export const Header = ({ sidebarOpen, toggleSidebar }: HeaderProps) => {
             />
           </div>
 
-          {/* Location Filter */}
-          <select className="px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:border-emerald-500">
-            <option>All Locations</option>
-            <option>Apex</option>
-            <option>Lagos Zone</option>
-            <option>Ikeja Branch</option>
-          </select>
-
-          {/* Date Range */}
-          <div className="hidden xl:flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm">
-            <span>29 Sep 2026 - 29 Sep 2026</span>
-          </div>
-
+        
           {/* Notifications */}
-          <button className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors">
-            <Bell className="w-5 h-5" />
-            <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-          </button>
+          <NotificationsPanel />
 
           {/* User Avatar & Dropdown */}
           <div className="relative group">

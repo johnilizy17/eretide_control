@@ -1,7 +1,6 @@
 import {
   LayoutDashboard,
   ArrowLeftRight,
-  CheckSquare,
   Wallet,
   Send,
   Activity,
@@ -26,7 +25,6 @@ export interface NavItem {
 export const navigationItems: NavItem[] = [
   { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { path: '/transactions', label: 'Transactions', icon: ArrowLeftRight },
-  { path: '/approvals', label: 'Approvals', icon: CheckSquare, badge: true },
   { path: '/accounts', label: 'Accounts', icon: Wallet },
   { path: '/transfers', label: 'Transfers', icon: Send },
   { path: '/monitoring', label: 'Monitoring', icon: Activity },
@@ -39,8 +37,8 @@ export const navigationItems: NavItem[] = [
   { path: '/settings', label: 'Settings', icon: Settings },
 ];
 
-// The four primary destinations shown directly in the mobile bottom bar.
-export const primaryNavPaths = ['/dashboard', '/transactions', '/approvals', '/accounts'];
+// The three primary destinations shown directly in the mobile bottom bar.
+export const primaryNavPaths = ['/dashboard', '/transactions', '/accounts'];
 
 export const primaryNavItems = navigationItems.filter((item) =>
   primaryNavPaths.includes(item.path)
