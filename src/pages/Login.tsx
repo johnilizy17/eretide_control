@@ -2,8 +2,14 @@ import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Lock, Mail, AlertCircle } from 'lucide-react';
-import { authApi } from '../api';
+import { authApi, auditLogsApi } from '../api';
 import { useAuthStore } from '../store/authStore';
+import { FaceVerificationModal } from '../components/FaceVerificationModal';
+
+interface PendingCredentials {
+  token: string;
+  profile: any;
+}
 
 export const Login = () => {
   const navigate = useNavigate();
@@ -16,6 +22,20 @@ export const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [pending, setPending] = useState<PendingCredentials | null>(null);
+  const [verifyOpen, setVerifyOpen] = useState(false);
+
+  const finishLogin = (profile: any, token: string) => {
+    setAuth(
+      {
+        ...profile,
+        id: profile._id ?? profile.id,
+        name: profile.name ?? `${profile.firstname ?? ''} ${profile.lastname ?? ''}`.trim(),
+      },
+      token
+    );
+    navigate('/dashboard');
+  };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -34,17 +54,15 @@ export const Login = () => {
         throw new Error('Invalid login response from server');
       }
 
-      setAuth(
-        {
-          ...profile,
-          id: profile._id ?? profile.id,
-          name: profile.name ?? `${profile.firstname ?? ''} ${profile.lastname ?? ''}`.trim(),
-        },
-        token
-      );
+      // When a profile photo is on record, confirm the live camera matches it
+      if (profile.photo) {
+        setPending({ token, profile });
+        setVerifyOpen(true);
+        return;
+      }
 
       // Redirect to dashboard
-      navigate('/dashboard');
+      finishLogin(profile, token);
     } catch (err: any) {
       console.error('Login error:', err);
       setError(
@@ -55,6 +73,34 @@ export const Login = () => {
       setLoading(false);
     }
   };
+
+  const handleVerified = () => {
+    if (!pending) return;
+    // Best-effort audit trail entry for the successful face check
+    auditLogsApi
+      .write({
+        action: 'FACE_VERIFIED',
+        object_type: 'Login',
+        object_id: pending.profile._id ?? pending.profile.id,
+        description: `Face verification passed for ${pending.profile.email ?? ''}`,
+      })
+      .catch(() => {});
+    finishLogin(pending.profile, pending.token);
+    setPending(null);
+    setVerifyOpen(false);
+  };
+
+  const handleContinue = () => {
+    if (!pending) return;
+    finishLogin(pending.profile, pending.token);
+    setPending(null);
+    setVerifyOpen(false);
+  };
+
+  const profileName =
+    (pending?.profile?.name ??
+      `${pending?.profile?.firstname ?? ''} ${pending?.profile?.lastname ?? ''}`.trim()) ||
+    'User';
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -209,6 +255,16 @@ export const Login = () => {
           </p>
         </div>
       </div>
+
+      {/* Post-login face verification */}
+      {verifyOpen && pending?.profile?.photo && (
+        <FaceVerificationModal
+          photo={pending.profile.photo}
+          profileName={profileName}
+          onVerified={handleVerified}
+          onContinue={handleContinue}
+        />
+      )}
     </div>
   );
 };

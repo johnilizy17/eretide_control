@@ -134,6 +134,13 @@ export const auditLogsApi = {
     const body = res.data?.data ?? res.data;
     return (body?.data ?? body) as AuditLogListResult;
   },
+  write: (payload: {
+    action: string;
+    object_type?: string;
+    object_id?: string;
+    description?: string;
+    metadata?: Record<string, any>;
+  }) => apiClient.post('/audit-logs', payload),
 };
 
 // Notifications API (eretide_backend: /notification)
