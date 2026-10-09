@@ -13,7 +13,10 @@ const MATCH_THRESHOLD = 0.5;
 
 const MODEL_PATH = '/models';
 
+const DETECTOR_INPUT_SIZE = 512;
+
 const loadModels = async () => {
+  await (faceapi.tf as any).ready();
   const nets = faceapi.nets as any;
   const tasks: Promise<unknown>[] = [];
   if (!nets.tinyFaceDetector.isLoaded) {
@@ -152,7 +155,7 @@ export const FaceVerificationModal = ({
     setResult(null);
     setMessage('');
 
-    const options = new faceapi.TinyFaceDetectorOptions({ inputSize: 416 });
+    const options = new faceapi.TinyFaceDetectorOptions({ inputSize: DETECTOR_INPUT_SIZE });
 
     let liveDetection: any;
     try {
@@ -168,7 +171,9 @@ export const FaceVerificationModal = ({
     }
 
     if (!liveDetection) {
-      setMessage('No face detected in the camera feed. Make sure your face is clearly visible.');
+      setMessage(
+        'No face detected. Make sure your face is fully in frame with good lighting, facing the camera directly, and not too far away.'
+      );
       setVerifying(false);
       return;
     }
